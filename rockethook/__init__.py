@@ -8,10 +8,11 @@ Or you can just Webhook.quick_post('Your message') without bothering with Messag
 """
 
 import json
-import httplib
+import http.client
 import urllib
 
-from urlparse import urlparse
+from urllib.parse import urlparse
+
 
 
 class WebhookError(Exception):
@@ -76,13 +77,13 @@ class Webhook(object):
             payload_dict['icon_url'] = message.icon_url
         if message.attachments:
             payload_dict['attachments'] = message.attachments
-        payload = 'payload=' + urllib.quote_plus(json.dumps(payload_dict))
+        payload = 'payload=' + urllib.parse.quote_plus(json.dumps(payload_dict))
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         if self.scheme == 'https':
-            conn = httplib.HTTPSConnection(self.server_fqdn)
+            conn = http.client.HTTPSConnection(self.server_fqdn)
         else:
-            conn = httplib.HTTPConnection(self.server_fqdn)
+            conn = http.client.HTTPConnection(self.server_fqdn)
         conn.request('POST', '/hooks/' + self.token, payload, headers)
         response = conn.getresponse()
         status = response.status
